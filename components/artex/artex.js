@@ -1,8 +1,7 @@
 import { useWalletInfo } from "components/hooks/web3";
 import { useWeb3 } from "components/providers";
 import { useState } from "react";
-import moment from "moment";
-import { toast } from 'react-toastify';
+
 import 'react-toastify/dist/ReactToastify.css';
 import Image from "next/image";
 import artexlogo from "img/artex-logo.png"
@@ -10,16 +9,6 @@ import artexlogo from "img/artex-logo.png"
 
 
 
-export const normalizegetdata = (data) => {
-
-  return {
-    account: data.person,
-    duration: data.duration,
-    stake_time: data.stake_time,
-    amount: data.amount,
-    id: data.id
-  }
-}
 
 
 
@@ -39,95 +28,6 @@ export default function Artex() {
 
 
 
-
-  const date = moment().format("DD-MMM-YYYY hh:mm ")
-  
-  function getRedeemDate(udate, _days) {
-    return moment.unix(udate).add(getDuration(_days), 'days').format('DD-MMM-YYYY hh:mm ')
-  }
-
-  function getDuration(_days) {
-    if (_days == 1) {
-      return 60
-    }
-    else if (_days == 2) {
-      return 90
-    }
-    else if (_days == 3) {
-      return 120
-    }
-    else if (_days == 4) {
-      return 365
-    }
-    else
-      return 0
-  }
-  function getInterest(_days) {
-    if (_days == 1) {
-      return 15
-    }
-    else if (_days == 2) {
-      return 20
-    }
-    else if (_days == 3) {
-      return 30
-    }
-    else if (_days == 4) {
-      return 90
-    }
-    else
-      return 0
-  }
-  
-
-
-  async function Stake(_stakeamt, _option) {
-    try {      if (_stakeamt <= 0 && _option == 0) {
-        toast.error('Invalid Amount!!! Please Enter the correct Amount.......', {
-          position: "top-center",
-          autoClose: 20000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-        return
-      }
-      await contract?.methods.Stake(_option, _stakeamt).send({ from: account.data })
-    }
-    catch (error) { console.log(error) }
-  }
-
- 
-  function Calculate(_interest, _days) {
-    try {
-      setSelectInterest(_interest)
-      setInterestAmt(stakeAmount * (_interest / 100))
-      setRedemptionDate(moment().add(_days - 1, 'days').format('DD-MMM-YYYY hh:mm '))
-      if (_interest == 15) {
-        setOption(1)
-      }
-      else if (_interest == 20) {
-        setOption(2)
-      }
-      else if (_interest == 30) {
-        setOption(3)
-      }
-      else if (_interest == 90) {
-        setOption(4)
-      }
-    }
-    catch (error) { console.log(error) }
-  }
-  function Calculate1() {
-    try {
-
-      setInterestAmt(stakeAmount * (selectInterest / 100))
-
-    }
-    catch (error) { console.log(error) }
-  }
 
   return (
     <>
@@ -165,33 +65,25 @@ export default function Artex() {
                     cursor-pointer focus:outline-none  hover:bg-[#04009a] hover:text-white 
                      peer-checked:bg-[#04009a] peer-checked:text-white  font-bold peer-checked:ring-1 
                     peer-checked:border-transparent justify-center"
-                      htmlFor="60" onClick={() => {
-                        Calculate(15, 60)
-                      }}>{"60 Day's"}</label>
+                      htmlFor="60" >{"60 Day's"}</label>
                   </div>
                   <div >
                     <input className="sr-only peer" type="radio" value="90 Days" name="answer" id="90" />
                     <label className="flex rounded-full p-2  justify-center  text-sm bg-white border border-gray-300  cursor-pointer focus:outline-none 
                    hover:bg-[#04009a] hover:text-white px-3 pr-3 lg:px-4 lg:pr-4 peer-checked:bg-[#04009a] peer-checked:text-white  font-bold peer-checked:ring-1 peer-checked:border-transparent"
-                      htmlFor="90" onClick={() => {
-                        Calculate(20, 90)
-                      }}>{"90 Day's"}</label>
+                      htmlFor="90" >{"90 Day's"}</label>
                   </div>
                   <div >
                     <input className="sr-only peer" type="radio" value="120 Days" name="answer" id="120" />
                     <label className="flex rounded-full p-2 text-center text-sm bg-white border border-gray-300  cursor-pointer focus:outline-none
                    hover:bg-[#04009a] hover:text-white px-3 pr-3 justify-center lg:px-4 lg:pr-4 peer-checked:bg-[#04009a] peer-checked:text-white  font-bold peer-checked:ring-1 peer-checked:border-transparent"
-                      htmlFor="120" onClick={() => {
-                        Calculate(30, 120)
-                      }}>{"120 Day's"}</label>
+                      htmlFor="120" >{"120 Day's"}</label>
                   </div>
                   <div >
                     <input className="sr-only peer" type="radio" value="365 Days" name="answer" id="365" />
                     <label className="flex rounded-full p-2 text-center  text-sm bg-white border border-gray-300  cursor-pointer focus:outline-none
                    hover:bg-[#04009a] hover:text-white px-3 pr-3 justify-center lg:px-4 lg:pr-4 peer-checked:bg-[#04009a] peer-checked:text-white  font-bold peer-checked:ring-1 peer-checked:border-transparent"
-                      htmlFor="365" onClick={() => {
-                        Calculate(90, 365)
-                      }}>{"365 Day's"}</label>
+                      htmlFor="365" >{"365 Day's"}</label>
                   </div>
                 </div>
               </div>
@@ -202,18 +94,12 @@ export default function Artex() {
               <div className="flex flex-row mt-5  justify-between items-center rounded-lg bg-white  ">
                 <input placeholder="Please enter the Amount" value={stakeAmount} name="addressTo" type="number" 
                 className="rounded-2xl font-semibold text-slate-500 text-sm  lg:w-96 border-0 lg:h-12 w-40 lg:96   "
-                  onChange={({ target: { value } }) => {
-                    setStakeAmount(value)
-                    Calculate1()
-                  }} />
+                   />
                 <div>
                   <span className="font-semibold lg:text-sm text-xs mr-2">Artex</span>
                   <button className="bg-[#04009a] text-white font-semibold text-xs lg:text-sm p-2 lg:px-4 lg:pr-4 
                    hover:bg-blue-700 rounded-full"
-                    onClick={() => {
-                      setStakeAmount(maxBal)
-                      Calculate1()
-                    }}
+                   
                   >Max Amount</button>                 
                 </div>
               </div>
@@ -223,7 +109,7 @@ export default function Artex() {
               <div className="bg-white mt-3 lg:p-5 rounded-lg ">
                 <div className="flex p-2 justify-between items-center  w-full">
                   <span className=" text-sm text-left">Stake Date</span>
-                  <span className="justify-end items-end text-right text-md">{date}</span>
+                  <span className="justify-end items-end text-right text-md">sss</span>
                 </div>
                 <div className="flex p-2 justify-between items-center  w-full">
                   <span className="text-sm text-left">Redemption Date</span>
@@ -247,9 +133,7 @@ export default function Artex() {
                 type="button"
                 className="text-white text-md font-semibold w-full mt-2  p-2 bg-[#04009a]  hover:bg-blue-700 
                 rounded-full cursor-pointer"
-                onClick={() => {
-                  Stake(stakeAmount, option)
-                }}
+                
               > Approve Staking</button>
             </div>
           </div>
