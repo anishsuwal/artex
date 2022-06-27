@@ -12,7 +12,7 @@ export default function Home() {
     <BaseLayout>
         <div className="bg-green font-Montserrat ">
           <Navbar/>
-           <Artex/>   
+           
         </div> 
     </BaseLayout>
   )
