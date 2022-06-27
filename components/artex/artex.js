@@ -1,9 +1,7 @@
 import { useWalletInfo } from "components/hooks/web3";
 import { useWeb3 } from "components/providers";
-import { Button } from "components/ui/common";
 import { useState } from "react";
 import moment from "moment";
-import useSWR from "swr"
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Image from "next/image";
@@ -23,18 +21,10 @@ export const normalizegetdata = (data) => {
   }
 }
 
-const notify = () => toast.warn('If You cancel staking, you will be charged with 25% cancellation fee.', {
-  position: "top-center",
-  autoClose: 10000,
-  hideProgressBar: false,
-  closeOnClick: true,
-  pauseOnHover: true,
-  draggable: true,
-  progress: undefined,
-});
+
 
 export default function Artex() {
-  const { contract, connect, isLoading, requireInstall } = useWeb3()
+  const { contract } = useWeb3()
 
   const { account } = useWalletInfo()
 
@@ -51,10 +41,7 @@ export default function Artex() {
 
 
   const date = moment().format("DD-MMM-YYYY hh:mm ")
-  function getUnixDate(udate) {
-    var dateString = moment.unix(udate).format('DD-MMM-YYYY hh:mm ')
-    return dateString
-  }
+  
   function getRedeemDate(udate, _days) {
     return moment.unix(udate).add(getDuration(_days), 'days').format('DD-MMM-YYYY hh:mm ')
   }
@@ -91,77 +78,7 @@ export default function Artex() {
     else
       return 0
   }
-  const Transaction = () => {
-    const swrRes = useSWR(() =>
-      contract ? "hi" : "problem",
-      async () => {
-
-        const data = []
-        var _cnt = await contract?.methods.getInvestmentCount().call()
-        for (let i = 0; i < _cnt; i++) {
-
-          const _dd = await contract?.methods._userdata(i).call()
-          const normalized = normalizegetdata(_dd)
-          data.push(normalized)
-        }
-        return data
-      }
-    )
-    maxAmount()
-    //swrRes.data?.map(x=>console.log(x.stake_time,"I am wokring with object array"))
-
-    return swrRes.data?.map(x => (
-
-      <div className="hover:bg-slate-200  container text-sm mx-auto p-5 lg:p-0 " key={x.account}>
-
-        <div className="grid justify-between items-center  grid-cols-1 md:grid-cols-2  lg:grid-cols-8" >
-          <div className="flex flex-1 justify-between grid-cols-2 lg:grid-rows-2 p-3 grid-flow-col">
-            <div className="flex flex-1 items-center">
-              <Image
-                src={artexlogo}
-                alt="Artex Header Logo" 
-                layout="fixed"/>
-              <span className="px-3">Artex</span>
-            </div>
-          </div>
-          <div className="flex flex-1 justify-between grid-cols-2 lg:grid-rows-2 p-3 mb grid-flow-col">
-            <div className="  text-left lg:text-center  md:hidden lg:hidden xl:hidden 2xl:hidden"> Total Locked token</div>
-            <div className="  text-right" >{x.amount} ARTEX</div>
-          </div>
-          <div className="flex flex-1 justify-between grid-cols-2 lg:grid-rows-2 p-3 grid-flow-col">
-            <div className="  text-left lg:text-center  md:hidden lg:hidden xl:hidden 2xl:hidden">Duration</div>
-            <div className="  text-right  ">{getDuration(x.id)} days</div>
-          </div>
-          <div className="flex flex-1  justify-between grid-cols-2 p-3  lg:grid-rows-2  grid-flow-col">
-            <div className="  text-left lg:text-center  md:hidden lg:hidden xl:hidden 2xl:hidden">Stake Date</div>
-            <div className="  text-right  "> {getUnixDate(x.stake_time)}</div>
-          </div>
-          <div className="flex flex-1 justify-between grid-cols-2 p-3 lg:grid-rows-2  grid-flow-col">
-            <div className="  text-left lg:text-center  md:hidden lg:hidden xl:hidden 2xl:hidden">Redemption Date</div>
-            <div className="  text-right  ">{getRedeemDate(x.stake_time, x.id)}</div>
-          </div>
-          <div className="flex flex-1 justify-between grid-cols-2 p-3 lg:grid-rows-2  grid-flow-col">
-            <div className="  text-left lg:text-center  md:hidden lg:hidden xl:hidden 2xl:hidden">Interests</div>
-            <div className="  text-right font-semibold  ">{getInterest(x.id)}% tokens On top</div>
-          </div>
-          <div className="flex flex-1 justify-between grid-cols-2 p-3 lg:grid-rows-2  grid-flow-col">
-            <div className="  text-left lg:text-center md:hidden lg:hidden xl:hidden 2xl:hidden">Total Earn</div>
-            <div className="  text-right  text-green-400 font-bold ">{(getInterest(x.id) / 100) * x.amount} ARTEX</div>
-          </div>
-          <div >
-            <button
-              type="button"
-              className="text-white w-full justify-center items-center text-center border-[1px] 
-                p-2 mt-2 bg-[#00a3ff] font-semibold  hover:bg-[#04009a]  rounded-full cursor-pointer"
-              onClick={notify}
-            >
-              Claim
-            </button>
-          </div>
-        </div>
-      </div>
-    ))
-  }
+  
 
 
   async function Stake(_stakeamt, _option) {
@@ -177,24 +94,12 @@ export default function Artex() {
         });
         return
       }
-      const temp = await contract?.methods.Stake(_option, _stakeamt).send({ from: account.data })
+      await contract?.methods.Stake(_option, _stakeamt).send({ from: account.data })
     }
     catch (error) { console.log(error) }
   }
 
-  async function maxAmount() {
-    try {
-      const temp = await contract?.methods.balanceOf(account.data).call()
-      const decimal = await contract?.methods.decimals().call()
-      const dec = 10 ** decimal
-      const _bal = (temp / dec)
-
-      setMaxBal(_bal)
-      return temp
-    }
-    catch (error) { console.log(error) }
-  }
-
+ 
   function Calculate(_interest, _days) {
     try {
       setSelectInterest(_interest)
@@ -364,11 +269,7 @@ export default function Artex() {
           <div className=" flex-1  text-center">Total Earn</div>
           <div className=" flex-1  "></div>
         </div>
-        <Transaction />
       </div>
-
-
-
     </>
   )
 }
