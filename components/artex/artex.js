@@ -364,7 +364,7 @@ export default function Artex() {
                 <span className="justify-end items-end text-xs text-right">Available Amount  {numFormatter.format(maxBal)}  ARTEX</span>
               </div>
               <div className="flex flex-row mt-3  justify-between items-center rounded-lg bg-white h-[48px]  ">
-                <input id="amount-input" placeholder="Please Enter the Amount" value={0} name="addressTo" type="number" 
+                <input id="amount-input" placeholder="Please Enter the Amount" value={stakeAmount || ''} name="addressTo" type="number" 
                 className="lg:flex rounded-2xl font-semibold text-slate-500 text-xs  lg:w-72 border-0 lg:h-12 w-[115px] hidden "
                   onChange={({ target: { value } }) => {
                     setStakeAmount(value)
